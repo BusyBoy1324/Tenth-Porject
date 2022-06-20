@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\gb.png" />
+    <None Remove="Images\kb.png" />
+    <None Remove="Images\mb.png" />
+    <None Remove="Images\TreeSizeIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DriveAnalyzer\DriveAnalyzer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\gb.png" />
+    <Resource Include="Images\kb.png" />
+    <Resource Include="Images\mb.png" />
+    <Resource Include="Images\TreeSizeIcon.png" />
+  </ItemGroup>
+
+</Project>
