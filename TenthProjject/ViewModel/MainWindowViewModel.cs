@@ -1,11 +1,14 @@
 ﻿using Microsoft.Win32;
+using Models;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TenthProject.DataProvider;
 
@@ -19,6 +22,11 @@ namespace TenthProject.ViewModel
     }
     public class MainWindowViewModel
     {
+        public IFileSystemDirectory fileSystemDirectory;
+        public IFileSystemDirectory FsDirectory
+        {
+            get { return fileSystemDirectory; }
+        }
         public static long size;
         private AlalyzeProvider dataProvider = new AlalyzeProvider();
         public MainWindowViewModel()
@@ -28,7 +36,6 @@ namespace TenthProject.ViewModel
             GB = new DelegateCommand.DelegateCommand(OnClick_GB);
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
         }
-
         public DisplayedUnit unit { get; set; }
         public ICommand ChooseDrive { get; set; }
         public ICommand KB { get; private set; }
@@ -40,6 +47,7 @@ namespace TenthProject.ViewModel
             VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
             dialog.ShowDialog();
             var DriveData = dataProvider.ScanDirectory(dialog.SelectedPath);
+            fileSystemDirectory = DriveData;
             size = DriveData.Size / 1024;
             unit = DisplayedUnit.Kilobyte;
             MessageBox.Show(size.ToString());
