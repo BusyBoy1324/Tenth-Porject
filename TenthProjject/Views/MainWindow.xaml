@@ -45,10 +45,17 @@
                 <MenuItem Header="Buy Now!"/>
             </MenuItem>
         </Menu>
-        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding FsDirectory}" 
+        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding FsObject}" 
                   Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="1" Grid.RowSpan="2" 
                   Width="600" Height="350" VerticalAlignment="Top">
-
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type viewmodel:MainWindowViewModel}" ItemsSource="{Binding FsObject}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Size}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
         </TreeView>
     </Grid>
 </Window>

@@ -22,11 +22,14 @@ namespace TenthProject.ViewModel
     }
     public class MainWindowViewModel
     {
-        public IFileSystemDirectory fileSystemDirectory;
-        public IFileSystemDirectory FsDirectory
+        public IFileSystemObject _fsObject;
+        public ObservableCollection<IFileSystemObject> FileSystemObject;
+        public ObservableCollection<IFileSystemObject> FsObject
         {
-            get { return fileSystemDirectory; }
+            get { return FileSystemObject; }
         }
+        public string Name => _fsObject.Name;
+        public long Size => _fsObject.Size;
         public static long size;
         private AlalyzeProvider dataProvider = new AlalyzeProvider();
         public MainWindowViewModel()
@@ -35,22 +38,28 @@ namespace TenthProject.ViewModel
             MB = new DelegateCommand.DelegateCommand(OnClick_MB);
             GB = new DelegateCommand.DelegateCommand(OnClick_GB);
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
+            FileSystemObject = new ObservableCollection<IFileSystemObject>();
         }
-        public DisplayedUnit unit { get; set; }
-        public ICommand ChooseDrive { get; set; }
+        public DisplayedUnit unit { get; private set; }
+        public ICommand ChooseDrive { get; private set; }
         public ICommand KB { get; private set; }
         public ICommand MB { get; private set; }
         public ICommand GB { get; private set; }
 
         public void OnClick_ChooseDrive(object obj)
         {
-            VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
-            dialog.ShowDialog();
-            var DriveData = dataProvider.ScanDirectory(dialog.SelectedPath);
-            fileSystemDirectory = DriveData;
+            VistaFolderBrowserDialog dialogBrowser = new VistaFolderBrowserDialog();
+            dialogBrowser.ShowDialog();
+            var DriveData = dataProvider.ScanDirectory(dialogBrowser.SelectedPath);
+            _fsObject = DriveData;
+            //FileSystemObject.Add(DriveData);
             size = DriveData.Size / 1024;
             unit = DisplayedUnit.Kilobyte;
             MessageBox.Show(size.ToString());
+            foreach (var children in DriveData.Childrens)
+            {
+                FileSystemObject.Add(children);
+            }
         }
         public void OnClick_KB(object obj)
         {
