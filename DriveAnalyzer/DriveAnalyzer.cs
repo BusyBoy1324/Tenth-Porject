@@ -41,7 +41,7 @@ namespace DriveAnalyzer
             }
             for (int i = 0; i < directoriesPromises.Count; i++)
             {
-                IFileSystemDirectory dir = await directoriesPromises[i];
+                IFileSystemObject dir = await directoriesPromises[i];
                 fsDirectory.Childrens.Add(dir);
                 fsDirectory.Size += dir.Size;
             }

@@ -13,11 +13,12 @@ namespace TenthProject.ViewModel
         static readonly TreeViewModel DummyChild = new TreeViewModel();
 
         readonly ObservableCollection<TreeViewModel> _children;
-        readonly TreeViewModel _parent;
+        private TreeViewModel _parent;
         public IFileSystemObject FileSystemObject;
 
-        public string Name => FileSystemObject.Name;
-        public long Size => FileSystemObject.Size;
+        public string Name;
+        public long Size;
+        public string Path;
 
         bool _isExpanded;
 
@@ -32,9 +33,9 @@ namespace TenthProject.ViewModel
                 _children.Add(DummyChild);
             }
         }
-        private TreeViewModel()
+        public TreeViewModel()
         {
-
+            _children = new ObservableCollection<TreeViewModel>();
         }
         public ObservableCollection<TreeViewModel> Children
         {
@@ -74,6 +75,7 @@ namespace TenthProject.ViewModel
         public TreeViewModel Parent
         {
             get { return _parent; }
+            set { _parent = value; }
         }
     }
 }

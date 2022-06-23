@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AutoMapper;
+using Microsoft.Win32;
 using Models;
 using Ookii.Dialogs.Wpf;
 using System;
@@ -23,13 +24,15 @@ namespace TenthProject.ViewModel
     public class MainWindowViewModel
     {
         public IFileSystemObject _fsObject;
-        public ObservableCollection<IFileSystemObject> FileSystemObject;
-        public ObservableCollection<IFileSystemObject> FsObject
+        public ObservableCollection<TreeViewModel> _children;
+        public ObservableCollection<Drive> Drives;
+        public ObservableCollection<TreeViewModel> Children
         {
-            get { return FileSystemObject; }
+            get { return _children; }
         }
-        public string Name => _fsObject.Name;
-        public long Size => _fsObject.Size;
+        public DirectoryViewModel directoryViewModel;
+        public string Name => directoryViewModel.Name;
+        public long Size => directoryViewModel.Size;
         public static long size;
         private AlalyzeProvider dataProvider = new AlalyzeProvider();
         public MainWindowViewModel()
@@ -38,7 +41,8 @@ namespace TenthProject.ViewModel
             MB = new DelegateCommand.DelegateCommand(OnClick_MB);
             GB = new DelegateCommand.DelegateCommand(OnClick_GB);
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
-            FileSystemObject = new ObservableCollection<IFileSystemObject>();
+            _children = new ObservableCollection<TreeViewModel>();
+            Drives = new ObservableCollection<Drive>();
         }
         public DisplayedUnit unit { get; private set; }
         public ICommand ChooseDrive { get; private set; }
@@ -51,15 +55,52 @@ namespace TenthProject.ViewModel
             VistaFolderBrowserDialog dialogBrowser = new VistaFolderBrowserDialog();
             dialogBrowser.ShowDialog();
             var DriveData = dataProvider.ScanDirectory(dialogBrowser.SelectedPath);
+            var modelTomapp = DriveData;
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<IFileSystemObject, DirectoryViewModel>();
+            });
+            Mapper mapper = new Mapper(config);
+            directoryViewModel = mapper.Map<IFileSystemObject, DirectoryViewModel>(modelTomapp);
+            ObservableCollection<TreeViewModel> childrens = GetObservableCollection(DriveData.Childrens);
+            foreach (TreeViewModel model in childrens)
+            {
+                directoryViewModel.Children.Add(model);
+                directoryViewModel.Children[directoryViewModel.Children.Count-1].Parent = directoryViewModel;
+            }
+            _children.Add(directoryViewModel);
             _fsObject = DriveData;
-            //FileSystemObject.Add(DriveData);
             size = DriveData.Size / 1024;
             unit = DisplayedUnit.Kilobyte;
             MessageBox.Show(size.ToString());
-            foreach (var children in DriveData.Childrens)
+        }
+
+        private TreeViewModel ConvertFromIFileSystemObject(IFileSystemObject fsObject)
+        {
+            var treeModel= new TreeViewModel();
+            treeModel.Name = fsObject.Name;
+            treeModel.Size = fsObject.Size;
+            treeModel.Path= fsObject.Path;
+            if(fsObject is IFileSystemDirectory)
             {
-                FileSystemObject.Add(children);
+                IFileSystemDirectory fsDirectory = fsObject as IFileSystemDirectory;
+                for (int i = 0; i < fsDirectory.Childrens.Count; i++)
+                {
+                    treeModel.Children.Add(ConvertFromIFileSystemObject(fsDirectory.Childrens[i]));
+                    treeModel.Children[i].Parent = treeModel;
+                }
             }
+            return treeModel;
+        }
+
+        private ObservableCollection<TreeViewModel> GetObservableCollection(ObservableCollection<IFileSystemObject> fsObject)
+        {
+            ObservableCollection<TreeViewModel> result = new ObservableCollection<TreeViewModel>(); 
+            foreach (IFileSystemObject fsObjectItem in fsObject)
+            {
+                result.Add(ConvertFromIFileSystemObject(fsObjectItem));
+            }
+            return result;
         }
         public void OnClick_KB(object obj)
         {

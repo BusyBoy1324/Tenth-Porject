@@ -14,7 +14,10 @@ namespace TenthProject.ViewModel
         {
             FileSystemObject = directory;
         }
+        public DirectoryViewModel()
+        {
 
+        }
         protected override void LoadChildren()
         {
             foreach (string directory in System.IO.Directory.GetDirectories(FileSystemObject.Path))

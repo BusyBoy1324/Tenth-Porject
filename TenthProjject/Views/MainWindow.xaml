@@ -45,16 +45,47 @@
                 <MenuItem Header="Buy Now!"/>
             </MenuItem>
         </Menu>
-        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding FsObject}" 
+        <TreeView DataContext="{StaticResource treeModel}" ItemsSource="{Binding Children}" 
                   Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="1" Grid.RowSpan="2" 
                   Width="600" Height="350" VerticalAlignment="Top">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                    <Style.Triggers>
+                        <Trigger Property="FontWeight" Value="Bold"/>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type viewmodel:MainWindowViewModel}" ItemsSource="{Binding FsObject}">
+                <HierarchicalDataTemplate DataType="{x:Type viewmodel:DriveViewModel}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="{Binding Size}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
+
+                <HierarchicalDataTemplate DataType="{x:Type viewmodel:DirectoryViewModel}" ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Size}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <HierarchicalDataTemplate DataType="{x:Type viewmodel:TreeViewModel}" ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Size}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type viewmodel:FileViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Size}"/>
+                    </StackPanel>
+                </DataTemplate>
             </TreeView.Resources>
         </TreeView>
     </Grid>
