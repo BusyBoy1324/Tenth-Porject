@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Win32;
-using Models;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TenthProject.DataProvider;
+using TenthProject.Models;
 
 namespace TenthProject.ViewModel
 {
@@ -24,24 +24,18 @@ namespace TenthProject.ViewModel
     public class MainWindowViewModel
     {
         public IFileSystemObject _fsObject;
-        public ObservableCollection<TreeViewModel> _children;
-        public ObservableCollection<Drive> Drives;
-        public ObservableCollection<TreeViewModel> Children
-        {
-            get { return _children; }
-        }
-        public DirectoryViewModel directoryViewModel;
-        public string Name => directoryViewModel.Name;
-        public long Size => directoryViewModel.Size;
+        public ObservableCollection<Drive> Drives { get; set; }
+        public string Name;
+        public long Size;
+        public string Path;
         public static long size;
-        private AlalyzeProvider dataProvider = new AlalyzeProvider();
+        readonly AlalyzeProvider dataProvider = new AlalyzeProvider();
         public MainWindowViewModel()
         {
             KB = new DelegateCommand.DelegateCommand(OnClick_KB);
             MB = new DelegateCommand.DelegateCommand(OnClick_MB);
             GB = new DelegateCommand.DelegateCommand(OnClick_GB);
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
-            _children = new ObservableCollection<TreeViewModel>();
             Drives = new ObservableCollection<Drive>();
         }
         public DisplayedUnit unit { get; private set; }
@@ -54,54 +48,32 @@ namespace TenthProject.ViewModel
         {
             VistaFolderBrowserDialog dialogBrowser = new VistaFolderBrowserDialog();
             dialogBrowser.ShowDialog();
+            //Parallel 1
             var DriveData = dataProvider.ScanDirectory(dialogBrowser.SelectedPath);
-            var modelTomapp = DriveData;
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<IFileSystemObject, DirectoryViewModel>();
-            });
-            Mapper mapper = new Mapper(config);
-            directoryViewModel = mapper.Map<IFileSystemObject, DirectoryViewModel>(modelTomapp);
-            ObservableCollection<TreeViewModel> childrens = GetObservableCollection(DriveData.Childrens);
-            foreach (TreeViewModel model in childrens)
-            {
-                directoryViewModel.Children.Add(model);
-                directoryViewModel.Children[directoryViewModel.Children.Count-1].Parent = directoryViewModel;
-            }
-            _children.Add(directoryViewModel);
+            var drive = DirectoryToDrive(DriveData);
             _fsObject = DriveData;
+            Name = _fsObject.Name;
+            Size = _fsObject.Size;
+            Path = _fsObject.Path;
+            //Parallel 2
+            Drives.Add(drive);
             size = DriveData.Size / 1024;
             unit = DisplayedUnit.Kilobyte;
             MessageBox.Show(size.ToString());
         }
 
-        private TreeViewModel ConvertFromIFileSystemObject(IFileSystemObject fsObject)
+        private Drive DirectoryToDrive(IFileSystemDirectory directory)
         {
-            var treeModel= new TreeViewModel();
-            treeModel.Name = fsObject.Name;
-            treeModel.Size = fsObject.Size;
-            treeModel.Path= fsObject.Path;
-            if(fsObject is IFileSystemDirectory)
+            var modelToMap = directory;
+            var config = new MapperConfiguration(cfg =>
             {
-                IFileSystemDirectory fsDirectory = fsObject as IFileSystemDirectory;
-                for (int i = 0; i < fsDirectory.Childrens.Count; i++)
-                {
-                    treeModel.Children.Add(ConvertFromIFileSystemObject(fsDirectory.Childrens[i]));
-                    treeModel.Children[i].Parent = treeModel;
-                }
-            }
-            return treeModel;
+                cfg.CreateMap<IFileSystemDirectory, Drive>();
+            });
+            Mapper mapper = new Mapper(config);
+            var drive = mapper.Map<IFileSystemDirectory, Drive>(modelToMap);
+            return drive;
         }
 
-        private ObservableCollection<TreeViewModel> GetObservableCollection(ObservableCollection<IFileSystemObject> fsObject)
-        {
-            ObservableCollection<TreeViewModel> result = new ObservableCollection<TreeViewModel>(); 
-            foreach (IFileSystemObject fsObjectItem in fsObject)
-            {
-                result.Add(ConvertFromIFileSystemObject(fsObjectItem));
-            }
-            return result;
-        }
         public void OnClick_KB(object obj)
         {
             if (unit == DisplayedUnit.Gigabyte)

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:TenthProject.ViewModel"
         xmlns:local="clr-namespace:TenthProject"
+        xmlns:model="clr-namespace:TenthProject.Models"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -15,23 +16,23 @@
             <RowDefinition Height="67*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20*"></ColumnDefinition>
-            <ColumnDefinition Width="34*"/>
-            <ColumnDefinition Width="171*"></ColumnDefinition>
+            <ColumnDefinition Width="71*"></ColumnDefinition>
+            <ColumnDefinition Width="121*"/>
+            <ColumnDefinition Width="135*"></ColumnDefinition>
+            <ColumnDefinition Width="473*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.Resources>
             <viewmodel:MainWindowViewModel x:Key="viewModel"></viewmodel:MainWindowViewModel>
-            <viewmodel:TreeViewModel x:Key="treeModel"></viewmodel:TreeViewModel>
         </Grid.Resources>
 
-        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding KB}" Grid.Row="1" HorizontalAlignment="Left"/>
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding KB}" Grid.Row="1" HorizontalAlignment="Left" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
         <Image Source="pack://application:,,,/Images/kb.png" Width="20" Height="10" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Left"></Image>
 
-        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding MB}" Grid.Row="1" HorizontalAlignment="Center"/>
-        <Image Source="pack://application:,,,/Images/mb.png" Width="20" Height="10" Grid.Row="2" VerticalAlignment="Top"></Image>
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding MB}" Grid.Row="1" HorizontalAlignment="Center" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
+        <Image Source="pack://application:,,,/Images/mb.png" Height="10" Grid.Row="2" VerticalAlignment="Top" Width="15"/>
 
-        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding GB}" Grid.Row="1" HorizontalAlignment="Right"/>
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding GB}" Grid.Row="1" HorizontalAlignment="Right" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
         <Image Source="pack://application:,,,/Images/gb.png" Width="20" Height="10" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Top"></Image>
 
         <Menu Height="20" VerticalAlignment="Top" Width="220" HorizontalAlignment="Left" Grid.ColumnSpan="3">
@@ -45,43 +46,30 @@
                 <MenuItem Header="Buy Now!"/>
             </MenuItem>
         </Menu>
-        <TreeView DataContext="{StaticResource treeModel}" ItemsSource="{Binding Children}" 
-                  Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="1" Grid.RowSpan="2" 
-                  Width="600" Height="350" VerticalAlignment="Top">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                    <Setter Property="FontWeight" Value="Normal"/>
-                    <Style.Triggers>
-                        <Trigger Property="FontWeight" Value="Bold"/>
-                    </Style.Triggers>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            
+        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding Drives}" 
+                  Grid.Row="2" Grid.ColumnSpan="3" Grid.Column="1" Grid.RowSpan="2" Height="350" VerticalAlignment="Top" Width="600">
+
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type viewmodel:DriveViewModel}" ItemsSource="{Binding Children}">
+
+                <HierarchicalDataTemplate DataType="{x:Type model:Drive}" ItemsSource="{Binding Childrens}">
                     <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/disk.jpg"/>
+                        <TextBlock Text="{Binding Path}"/>
+                        <TextBlock Text="{Binding Size}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <HierarchicalDataTemplate DataType="{x:Type model:Directory}" ItemsSource="{Binding Childrens}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/folder.png"/>
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="{Binding Size}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
-                <HierarchicalDataTemplate DataType="{x:Type viewmodel:DirectoryViewModel}" ItemsSource="{Binding Children}">
+                <DataTemplate DataType="{x:Type model:File}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}"/>
-                        <TextBlock Text="{Binding Size}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-
-                <HierarchicalDataTemplate DataType="{x:Type viewmodel:TreeViewModel}" ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}"/>
-                        <TextBlock Text="{Binding Size}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-
-                <DataTemplate DataType="{x:Type viewmodel:FileViewModel}">
-                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/file.png"/>
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="{Binding Size}"/>
                     </StackPanel>

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public interface IFileSystemDirectory : IFileSystemObject
-    {
-        public ObservableCollection<IFileSystemObject> Childrens { get; set; }
-    }
+    //public interface IFileSystemDirectory : IFileSystemObject
+    //{
+    //    public ObservableCollection<IFileSystemObject> Childrens { get; set; }
+    //}
 }

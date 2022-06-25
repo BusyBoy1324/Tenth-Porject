@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DriveAnalyzer;
-using Models;
+//using DriveAnalyzer;
+//using Models;
+using TenthProject.Models;
 
 namespace TenthProject.DataProvider
 {
@@ -12,7 +13,7 @@ namespace TenthProject.DataProvider
     {
         public IFileSystemDirectory ScanDirectory(string path)
         {
-            return DriveAnalyzer.DriveAnalyzer.ScanDirectory(path).Result;
+            return Analyzer.Analyzer.ScanDirectory(path).Result;
         }
     }
 }

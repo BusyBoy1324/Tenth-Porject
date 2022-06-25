@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\disk.jpg" />
+    <None Remove="Images\file.png" />
+    <None Remove="Images\folder.png" />
     <None Remove="Images\gb.png" />
     <None Remove="Images\kb.png" />
     <None Remove="Images\mb.png" />
@@ -20,10 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DriveAnalyzer\DriveAnalyzer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Resource Include="Images\disk.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\file.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\folder.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\gb.png" />
     <Resource Include="Images\kb.png" />
     <Resource Include="Images\mb.png" />
