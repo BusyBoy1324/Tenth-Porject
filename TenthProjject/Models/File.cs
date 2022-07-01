@@ -9,21 +9,31 @@ namespace TenthProject.Models
 {
     public class File : IFileSystemObject
     {
-        public File(string name, long size = 0, string path = "")
+        private string _name;
+        private ulong _size;
+        private string _path;
+
+        public string Name
         {
-            this.Name = name;
-            this.Size = size;
-            this.Path = path;
+            get => _name;
+            set { _name = value; }
+        }
+        public ulong Size
+        {
+            get => _size;
+            set { _size = value; }
         }
 
-        public File(FileInfo fileInfo)
+        public string Path
         {
-            Name = fileInfo.Name;
-            Size = fileInfo.Length;
-            Path = fileInfo.FullName;
+            get => _path;
+            set { _path = value; }
         }
-        public string Name { get; set; }
-        public long Size { get; set; }
-        public string Path { get; set; }
+        public File(System.IO.FileInfo fileInfo)
+        {
+            _name = fileInfo.Name;
+            _size = (ulong)fileInfo.Length;
+            _path = fileInfo.FullName;
+        }
     }
 }

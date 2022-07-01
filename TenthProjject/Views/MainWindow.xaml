@@ -6,6 +6,8 @@
         xmlns:viewmodel="clr-namespace:TenthProject.ViewModel"
         xmlns:local="clr-namespace:TenthProject"
         xmlns:model="clr-namespace:TenthProject.Models"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        ResizeMode="NoResize"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -46,24 +48,30 @@
                 <MenuItem Header="Buy Now!"/>
             </MenuItem>
         </Menu>
-        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding Drives}" 
+        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding Files}" 
                   Grid.Row="2" Grid.ColumnSpan="3" Grid.Column="1" Grid.RowSpan="2" Height="350" VerticalAlignment="Top" Width="600">
 
             <TreeView.Resources>
 
-                <HierarchicalDataTemplate DataType="{x:Type model:Drive}" ItemsSource="{Binding Childrens}">
+                <HierarchicalDataTemplate DataType="{x:Type model:Drive}" ItemsSource="{Binding NestedObjects}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Source="pack://application:,,,/Images/disk.jpg"/>
                         <TextBlock Text="{Binding Path}"/>
+                        <TextBlock Text="   |   "/>
                         <TextBlock Text="{Binding Size}"/>
+                        <TextBlock Text="   KB|  Files Count   "/>
+                        <TextBlock Text="{Binding Files}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
-                <HierarchicalDataTemplate DataType="{x:Type model:Directory}" ItemsSource="{Binding Childrens}">
+                <HierarchicalDataTemplate DataType="{x:Type model:Directory}" ItemsSource="{Binding NestedObjects}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Source="pack://application:,,,/Images/folder.png"/>
                         <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="   |   "/>
                         <TextBlock Text="{Binding Size}"/>
+                        <TextBlock Text="   KB |  Files Count   "/>
+                        <TextBlock Text="{Binding Files}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
 
@@ -71,7 +79,9 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Source="pack://application:,,,/Images/file.png"/>
                         <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="   |   "/>
                         <TextBlock Text="{Binding Size}"/>
+                        <TextBlock Text="   KB |"/>
                     </StackPanel>
                 </DataTemplate>
             </TreeView.Resources>

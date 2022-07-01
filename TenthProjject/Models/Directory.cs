@@ -7,24 +7,17 @@ using System.Threading.Tasks;
 
 namespace TenthProject.Models
 {
-    public class Directory : IFileSystemDirectory
+    public class Directory : IFileSystemObject
     {
-        public Directory(string name, string path, long size = 0, ObservableCollection<IFileSystemObject> childrens = null)
+        public Directory(string name, long size = 0, ObservableCollection<IFileSystemObject> childrens = null)
         {
-            this.Name = name;
-            this.Path = path;
-            if (childrens == null)
-            {
-                Childrens = new ObservableCollection<IFileSystemObject>();
-            }
-            else
-            {
-                Childrens = childrens;
-            }
+            Name = name;
+            Size = (ulong)size;
+            NestedObjects = childrens ?? new ObservableCollection<IFileSystemObject>();
         }
         public string Name { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
-        public ObservableCollection<IFileSystemObject> Childrens { get; set; }
+        public ulong Size { get; set; }
+        public ulong Files { get; set; }
+        public ObservableCollection<IFileSystemObject> NestedObjects { get; set; }
     }
 }

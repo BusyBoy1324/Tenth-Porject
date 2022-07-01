@@ -7,16 +7,18 @@ using System.Threading.Tasks;
 
 namespace TenthProject.Models
 {
-    public class Drive : IFileSystemDirectory
+    public class Drive : IFileSystemObject
     {
-        public Drive(string name)
+        public Drive(string name, long size = 0, List<IFileSystemObject> childrens = null)
         {
-            this.Name = name;
-            this.Childrens = new ObservableCollection<IFileSystemObject>();
+            Name = name;
+            Size = (ulong)size;
+            NestedObjects = childrens ?? new List<IFileSystemObject>();
         }
         public string Name { get; set; }
-        public ObservableCollection<IFileSystemObject> Childrens { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
+        public List<IFileSystemObject> NestedObjects { get; set; }
+        public ulong Subdirectories { get; set; }
+        public ulong Size { get; set; }
+        public ulong Files { get; set; }
     }
 }

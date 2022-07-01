@@ -9,7 +9,6 @@ namespace TenthProject.Models
     public interface IFileSystemObject
     {
         public string Name { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
+        public UInt64 Size { get; set; }
     }
 }
