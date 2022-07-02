@@ -53,17 +53,6 @@
 
             <TreeView.Resources>
 
-                <HierarchicalDataTemplate DataType="{x:Type model:Drive}" ItemsSource="{Binding NestedObjects}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/disk.jpg"/>
-                        <TextBlock Text="{Binding Path}"/>
-                        <TextBlock Text="   |   "/>
-                        <TextBlock Text="{Binding Size}"/>
-                        <TextBlock Text="   KB|  Files Count   "/>
-                        <TextBlock Text="{Binding Files}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-
                 <HierarchicalDataTemplate DataType="{x:Type model:Directory}" ItemsSource="{Binding NestedObjects}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="16" Height="16" Source="pack://application:,,,/Images/folder.png"/>
@@ -84,6 +73,7 @@
                         <TextBlock Text="   KB |"/>
                     </StackPanel>
                 </DataTemplate>
+
             </TreeView.Resources>
         </TreeView>
     </Grid>

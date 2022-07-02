@@ -22,17 +22,19 @@ namespace TenthProject.ViewModel
     public class MainWindowViewModel
     {
         public ObservableCollection<IFileSystemObject> Files { get; set; }
-        private static ConcurrentQueue<Models.File> _newFiles { get; set; }
+        private static Queue<Models.File> NewFiles { get; set; }
         public ObservableCollection<Drive> Drives { get; set; }
         private Dispatcher _dispatcher;
         private string _path;
         public static long size;
         private static Drive? _drive;
+        private Thread _scanThread;
+        private BackgroundWorker _worker;
         public MainWindowViewModel()
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
             Files = new ObservableCollection<IFileSystemObject>();
-            _newFiles = new ConcurrentQueue<File>();
+            NewFiles = new Queue<File>();
             worker_Init();
             KB = new DelegateCommand.DelegateCommand(OnClick_KB);
             MB = new DelegateCommand.DelegateCommand(OnClick_MB);
@@ -40,6 +42,7 @@ namespace TenthProject.ViewModel
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
             Drives = new ObservableCollection<Drive>();
             Analyzer.Analyzer.ScannedObjectsAdded += ObjectsPropertyChanged;
+            _scanThread = null;
         }
         public DisplayedUnit unit { get; private set; }
         public ICommand ChooseDrive { get; private set; }
@@ -47,12 +50,15 @@ namespace TenthProject.ViewModel
         public ICommand MB { get; private set; }
         public ICommand GB { get; private set; }
 
-        private static void ObjectsPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ObjectsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var f = Analyzer.Analyzer.ScannedObjects;
             for (int i = 0; i < f.Length; i++)
             {
-                _newFiles.Enqueue(f[i]);
+                _dispatcher.Invoke(() =>
+                {
+                    ParseObject(f[i]);
+                });
             }
         }
         public void OnClick_ChooseDrive(object obj)
@@ -60,43 +66,33 @@ namespace TenthProject.ViewModel
             VistaFolderBrowserDialog dialogBrowser = new VistaFolderBrowserDialog();
             dialogBrowser.ShowDialog();
             _path = dialogBrowser.SelectedPath;
-            Thread thread = new Thread(() =>
-                Analyzer.Analyzer.StartSync(dialogBrowser.SelectedPath));
-            thread.Start();
-
+            _scanThread = new Thread(() =>
+            {
+                var final = Analyzer.Analyzer.StartSync(dialogBrowser.SelectedPath);
+                _worker.Dispose();
+                _dispatcher.Invoke(() =>
+                {
+                    Files.Clear();
+                    for (int i = 0; i < final.NestedObjects.Count; i++)
+                    {
+                        Files.Add(final.NestedObjects[i]);
+                    }
+                });
+            });
+            _scanThread.Start();
             unit = DisplayedUnit.Kilobyte;
         }
         private void worker_Init()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += worker_DoWork;
-            worker.ProgressChanged += worker_ProgressChanged;
-            worker.RunWorkerAsync();
+            _worker = new BackgroundWorker();
+            _worker.WorkerReportsProgress = true;
+            _worker.DoWork += worker_DoWork;
+            _worker.ProgressChanged += worker_ProgressChanged;
+            _worker.RunWorkerAsync();
         }
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Files = new ObservableCollection<IFileSystemObject>();
-            while (true)
-            {
-                if (_newFiles.Count > 0)
-                {
-                    _dispatcher.Invoke(new Action(() =>
-                    {
-                        File file = null;
-                        while (!_newFiles.TryDequeue(out file))
-                        {
-                            Thread.Sleep(5);
-                        }
-                        ParseObject(file);
-                    }));
-                    Thread.Sleep(5);
-                }
-                else
-                {
-                    Thread.Sleep(50);
-                }
-            }
+
         }
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs progressChangedEventArgs)
         {
@@ -151,44 +147,11 @@ namespace TenthProject.ViewModel
                 }
 
                 fsObject.Size += file.Size;
-                (fsObject as Directory).Files += 1;
+                (fsObject as Directory).Files++;
                 nestedObjects = (fsObject as Directory).NestedObjects;
             }
-
             nestedObjects.Add(file);
         }
-        //public void GetDriveData(VistaFolderBrowserDialog dialogBrowser)
-        //{
-        //    var driveData = Analyzer.Analyzer.StartSync(dialogBrowser.SelectedPath);
-        //    _drive = DirectoryToDrive(driveData);
-        //}
-
-        //public void FillObservableCollection()
-        //{
-        //    ObservableCollection<Drive> _drives = new ObservableCollection<Drive>();
-        //    Drive temp = null;
-        //    while (true)
-        //    {
-        //        Thread.Sleep(200);
-        //        if (_drive != temp)
-        //        {
-        //            temp = _drive;
-        //            _drives.Add(_drive);
-        //        }
-        //    }
-        //}
-
-        //private Drive DirectoryToDrive(IFileSystemObject directory)
-        //{
-        //    var modelToMap = directory;
-        //    var config = new MapperConfiguration(cfg =>
-        //    {
-        //        cfg.CreateMap<IFileSystemObject, Drive>();
-        //    });
-        //    Mapper mapper = new Mapper(config);
-        //    var drive = mapper.Map<IFileSystemObject, Drive>(modelToMap);
-        //    return drive;
-        //}
 
         public void OnClick_KB(object obj)
         {

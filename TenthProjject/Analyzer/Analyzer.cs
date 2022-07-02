@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TenthProject.Models;
+using Directory = TenthProject.Models.Directory;
 
 namespace TenthProject.Analyzer
 {
@@ -29,8 +30,8 @@ namespace TenthProject.Analyzer
         {
             get
             {
-                Models.File[] result = _scannedObjects.ToArray();
                 _collectionMutex.WaitOne();
+                Models.File[] result = _scannedObjects.ToArray();
                 _scannedObjects.Clear();
                 _collectionMutex.ReleaseMutex();
                 return result;
@@ -81,6 +82,7 @@ namespace TenthProject.Analyzer
                             fsDirectory.NestedObjects.Add(new Models.File(fileInfo));
                             SafeAddToScannedObjects(new Models.File(fileInfo));
                             fsDirectory.Size += (ulong)fileInfo.Length;
+                            fsDirectory.Files++;
                         }
                         catch (Exception)
                         {
@@ -95,14 +97,16 @@ namespace TenthProject.Analyzer
                 Models.IFileSystemObject dir = await directoriesPromises[i];
                 fsDirectory.NestedObjects.Add(dir);
                 fsDirectory.Size += dir.Size;
+                fsDirectory.Files += dir.Files;
             }
             return fsDirectory;
         }
 
-        public static void StartSync(string path)
+        public static Directory StartSync(string path)
         {
             _stopScanning = false;
-            var f = ScanDirectory(path).Result;
+            var result = ScanDirectory(path).Result;
+            return result;
         }
 
         public static void ResumeScanning()

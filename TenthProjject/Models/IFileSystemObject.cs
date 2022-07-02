@@ -10,5 +10,6 @@ namespace TenthProject.Models
     {
         public string Name { get; set; }
         public UInt64 Size { get; set; }
+        public UInt64 Files { get; set; }
     }
 }

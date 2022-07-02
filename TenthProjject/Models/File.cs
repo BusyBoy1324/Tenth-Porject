@@ -12,6 +12,7 @@ namespace TenthProject.Models
         private string _name;
         private ulong _size;
         private string _path;
+        private ulong _files;
 
         public string Name
         {
@@ -28,6 +29,12 @@ namespace TenthProject.Models
         {
             get => _path;
             set { _path = value; }
+        }
+
+        public ulong Files
+        {
+            get => _files;
+            set { _files = value; }
         }
         public File(System.IO.FileInfo fileInfo)
         {
