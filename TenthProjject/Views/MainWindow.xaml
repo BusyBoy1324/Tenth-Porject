@@ -59,7 +59,7 @@
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="   |   "/>
                         <TextBlock Text="{Binding Size}"/>
-                        <TextBlock Text="   KB |  Files Count   "/>
+                        <TextBlock Text="   Units |  Files Count   "/>
                         <TextBlock Text="{Binding Files}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
@@ -70,7 +70,7 @@
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="   |   "/>
                         <TextBlock Text="{Binding Size}"/>
-                        <TextBlock Text="   KB |"/>
+                        <TextBlock Text="   Units |"/>
                     </StackPanel>
                 </DataTemplate>
 

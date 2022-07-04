@@ -10,7 +10,8 @@ namespace TenthProject.Models
     public class File : IFileSystemObject
     {
         private string _name;
-        private ulong _size;
+        //private ulong _size;
+        private double _size;
         private string _path;
         private ulong _files;
 
@@ -19,7 +20,12 @@ namespace TenthProject.Models
             get => _name;
             set { _name = value; }
         }
-        public ulong Size
+        //public ulong Size
+        //{
+        //    get => _size;
+        //    set { _size = value; }
+        //}
+        public double Size
         {
             get => _size;
             set { _size = value; }

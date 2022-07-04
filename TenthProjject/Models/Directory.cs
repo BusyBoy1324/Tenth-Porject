@@ -9,14 +9,15 @@ namespace TenthProject.Models
 {
     public class Directory : IFileSystemObject
     {
-        public Directory(string name, long size = 0, ObservableCollection<IFileSystemObject> childrens = null)
+        public Directory(string name, double size = 0, ObservableCollection<IFileSystemObject> childrens = null)
         {
             Name = name;
-            Size = (ulong)size;
+            Size = size;
             NestedObjects = childrens ?? new ObservableCollection<IFileSystemObject>();
         }
         public string Name { get; set; }
-        public ulong Size { get; set; }
+        //public ulong Size { get; set; }
+        public double Size { get; set; }
         public ulong Files { get; set; }
         public ObservableCollection<IFileSystemObject> NestedObjects { get; set; }
     }

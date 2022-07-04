@@ -22,27 +22,25 @@ namespace TenthProject.ViewModel
     public class MainWindowViewModel
     {
         public ObservableCollection<IFileSystemObject> Files { get; set; }
-        private static Queue<Models.File> NewFiles { get; set; }
-        public ObservableCollection<Drive> Drives { get; set; }
+        private Queue<File> NewFiles { get; set; }
         private Dispatcher _dispatcher;
         private string _path;
-        public static long size;
-        private static Drive? _drive;
         private Thread _scanThread;
         private BackgroundWorker _worker;
+        private Directory _finalDirectory;
         public MainWindowViewModel()
         {
-            _dispatcher = Dispatcher.CurrentDispatcher;
-            Files = new ObservableCollection<IFileSystemObject>();
             NewFiles = new Queue<File>();
-            worker_Init();
+            worker_Init();  
+            Analyzer.Analyzer.ScannedObjectsAdded += ObjectsPropertyChanged;
+            Files = new ObservableCollection<IFileSystemObject>();
+            _dispatcher = Dispatcher.CurrentDispatcher;
             KB = new DelegateCommand.DelegateCommand(OnClick_KB);
             MB = new DelegateCommand.DelegateCommand(OnClick_MB);
             GB = new DelegateCommand.DelegateCommand(OnClick_GB);
             ChooseDrive = new DelegateCommand.DelegateCommand(OnClick_ChooseDrive);
-            Drives = new ObservableCollection<Drive>();
-            Analyzer.Analyzer.ScannedObjectsAdded += ObjectsPropertyChanged;
             _scanThread = null;
+            unit = DisplayedUnit.Kilobyte;
         }
         public DisplayedUnit unit { get; private set; }
         public ICommand ChooseDrive { get; private set; }
@@ -68,19 +66,18 @@ namespace TenthProject.ViewModel
             _path = dialogBrowser.SelectedPath;
             _scanThread = new Thread(() =>
             {
-                var final = Analyzer.Analyzer.StartSync(dialogBrowser.SelectedPath);
+                _finalDirectory = Analyzer.Analyzer.StartSync(dialogBrowser.SelectedPath);
                 _worker.Dispose();
                 _dispatcher.Invoke(() =>
                 {
                     Files.Clear();
-                    for (int i = 0; i < final.NestedObjects.Count; i++)
+                    for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
                     {
-                        Files.Add(final.NestedObjects[i]);
+                        Files.Add(_finalDirectory.NestedObjects[i]);
                     }
                 });
             });
             _scanThread.Start();
-            unit = DisplayedUnit.Kilobyte;
         }
         private void worker_Init()
         {
@@ -91,10 +88,6 @@ namespace TenthProject.ViewModel
             _worker.RunWorkerAsync();
         }
         private void worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-
-        }
-        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs progressChangedEventArgs)
         {
 
         }
@@ -128,7 +121,7 @@ namespace TenthProject.ViewModel
                 IFileSystemObject fsObject = null;
                 for (int j = 0; j < nestedObjects.Count; j++)
                 {
-                    if (folders[i] == nestedObjects[j].Name)
+                    if (nestedObjects[j].Name == folders[i])
                     {
                         fsObject = nestedObjects[j];
                         break;
@@ -146,8 +139,8 @@ namespace TenthProject.ViewModel
                     fsObject = new Directory(folders[i]);
                 }
 
-                fsObject.Size += file.Size;
                 (fsObject as Directory).Files++;
+                fsObject.Size += file.Size;
                 nestedObjects = (fsObject as Directory).NestedObjects;
             }
             nestedObjects.Add(file);
@@ -155,42 +148,73 @@ namespace TenthProject.ViewModel
 
         public void OnClick_KB(object obj)
         {
-            if (unit == DisplayedUnit.Gigabyte)
+            if (unit == DisplayedUnit.Gigabyte && _finalDirectory != null)
             {
-                size = size * 1024 * 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.NestedObjects[i].Size = _finalDirectory.NestedObjects[i].Size * 1024 * 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
-            else if (unit == DisplayedUnit.Megabyte)
+            else if (unit == DisplayedUnit.Megabyte && _finalDirectory != null)
             {
-                size = size * 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.NestedObjects[i].Size = _finalDirectory.NestedObjects[i].Size * 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
             unit = DisplayedUnit.Kilobyte;
-            MessageBox.Show(size.ToString("#.##") + " kb");
         }
         public void OnClick_MB(object obj)
         {
-            if (unit == DisplayedUnit.Gigabyte)
+            if (unit == DisplayedUnit.Gigabyte && _finalDirectory != null)
             {
-                size = size * 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.NestedObjects[i].Size = _finalDirectory.NestedObjects[i].Size * 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
-            else if (unit == DisplayedUnit.Kilobyte)
+            else if (unit == DisplayedUnit.Kilobyte && _finalDirectory != null)
             {
-                size = size / 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.NestedObjects[i].Size = _finalDirectory.NestedObjects[i].Size / 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
             unit = DisplayedUnit.Megabyte;
-            MessageBox.Show(size.ToString("#.##") + " mb");
         }
         public void OnClick_GB(object obj)
         {
-            if (unit == DisplayedUnit.Megabyte)
+            if (unit == DisplayedUnit.Megabyte && _finalDirectory != null)
             {
-                size = size / 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.Size = _finalDirectory.Size / 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
-            else if (unit == DisplayedUnit.Kilobyte)
+            else if (unit == DisplayedUnit.Kilobyte && _finalDirectory != null)
             {
-                size = size / 1024 / 1024;
+                Files.Clear();
+                for (int i = 0; i < _finalDirectory.NestedObjects.Count; i++)
+                {
+                    _finalDirectory.NestedObjects[i].Size = _finalDirectory.NestedObjects[i].Size / 1024 / 1024;
+                    Files.Add(_finalDirectory.NestedObjects[i]);
+                }
             }
             unit = DisplayedUnit.Gigabyte;
-            MessageBox.Show(size.ToString("#.##") + " gb");
+        }
+        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs progressChangedEventArgs)
+        {
+
         }
     }
 }
