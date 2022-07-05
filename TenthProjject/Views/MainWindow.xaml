@@ -1,0 +1,80 @@
+﻿<Window Icon="/Images/TreeSizeIcon.png" x:Class="TenthProject.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodel="clr-namespace:TenthProject.ViewModel"
+        xmlns:local="clr-namespace:TenthProject"
+        xmlns:model="clr-namespace:TenthProject.Models"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        ResizeMode="NoResize"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="31*"></RowDefinition>
+            <RowDefinition Height="21*"/>
+            <RowDefinition Height="365*"/>
+            <RowDefinition Height="67*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="71*"></ColumnDefinition>
+            <ColumnDefinition Width="121*"/>
+            <ColumnDefinition Width="135*"></ColumnDefinition>
+            <ColumnDefinition Width="473*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.Resources>
+            <viewmodel:MainWindowViewModel x:Key="viewModel"></viewmodel:MainWindowViewModel>
+        </Grid.Resources>
+
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding KB}" Grid.Row="1" HorizontalAlignment="Left" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
+        <Image Source="pack://application:,,,/Images/kb.png" Width="20" Height="10" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Left"></Image>
+
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding MB}" Grid.Row="1" HorizontalAlignment="Center" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
+        <Image Source="pack://application:,,,/Images/mb.png" Height="10" Grid.Row="2" VerticalAlignment="Top" Width="15"/>
+
+        <RadioButton DataContext="{StaticResource viewModel}" Command="{Binding GB}" Grid.Row="1" HorizontalAlignment="Right" Height="15" Grid.RowSpan="2" Width="15" VerticalAlignment="Top"/>
+        <Image Source="pack://application:,,,/Images/gb.png" Width="20" Height="10" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Top"></Image>
+
+        <Menu Height="20" VerticalAlignment="Top" Width="220" HorizontalAlignment="Left" Grid.ColumnSpan="3">
+            <MenuItem Header="Analyze">
+                <MenuItem DataContext="{StaticResource viewModel}"  Header="Choose Drive" Command="{Binding ChooseDrive}"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="Help the developer"/>
+            </MenuItem>
+            <MenuItem Header="TreeSize Professional">
+                <MenuItem Header="Buy Now!"/>
+            </MenuItem>
+        </Menu>
+        <TreeView DataContext="{StaticResource viewModel}" ItemsSource="{Binding Files}" 
+                  Grid.Row="2" Grid.ColumnSpan="3" Grid.Column="1" Grid.RowSpan="2" Height="350" VerticalAlignment="Top" Width="600">
+
+            <TreeView.Resources>
+
+                <HierarchicalDataTemplate DataType="{x:Type model:Directory}" ItemsSource="{Binding NestedObjects}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/folder.png"/>
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="   |   "/>
+                        <TextBlock Text="{Binding Size}"/>
+                        <TextBlock Text="   Units |  Files Count   "/>
+                        <TextBlock Text="{Binding Files}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type model:File}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" Source="pack://application:,,,/Images/file.png"/>
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="   |   "/>
+                        <TextBlock Text="{Binding Size}"/>
+                        <TextBlock Text="   Units |"/>
+                    </StackPanel>
+                </DataTemplate>
+
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
+</Window>
